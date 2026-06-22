@@ -10,37 +10,29 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../prisma/generated/prisma/client';
 
 @Injectable()
-export class PrismaService implements OnModuleInit, OnModuleDestroy {
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
-  private readonly prisma: PrismaClient;
-  private readonly connectionString: string;
 
-  constructor(private readonly configService: ConfigService) {
-    this.connectionString =
-      this.configService.getOrThrow<string>('DATABASE_URL');
+   constructor(private readonly configService: ConfigService) {
+    const connectionString = configService.getOrThrow<string>('DATABASE_URL');
 
-    const adapter = new PrismaPg({ connectionString: this.connectionString });
+    const adapter = new PrismaPg({ connectionString });
 
-    this.prisma = new PrismaClient({
+    super({
       adapter,
-      log: [{ emit: 'event', level: 'error' }],
+      log: ['error'],
     });
   }
 
   async onModuleInit() {
     this.logger.log('[INIT] Prisma connecting...');
-    await this.prisma.$connect();
+    await this.$connect();
     this.logger.log('[INIT] Prisma connected');
   }
 
   async onModuleDestroy() {
     this.logger.log('[DESTROY] Prisma disconnecting...');
-    await this.prisma.$disconnect();
+    await this.$disconnect();
     this.logger.log('[DESTROY] Prisma disconnected');
-  }
-
-  /** Expose Prisma models (like prisma.user, prisma.post, etc.) */
-  get client() {
-    return this.prisma;
   }
 }
