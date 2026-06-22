@@ -1,9 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import {
+  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
+import { Socket } from 'socket.io';
+import { ChatService } from './chat.service';
 
 @WebSocketGateway({
   cors: {
@@ -11,10 +17,19 @@ import {
   },
 })
 export class ChatGateway {
+  constructor(private readonly chatService: ChatService) {}
+
   @SubscribeMessage('send_message')
-  handleMessage(
+  async handleMessage(
     @MessageBody() payload: { conversationId: string; content: string },
+    @ConnectedSocket() client: Socket,
   ) {
-    return 'service file';
+    const response = await this.chatService.handleMessage(
+      payload.conversationId,
+      payload.content,
+    );
+
+    // send back to same client
+    client.emit('receive_message', response);
   }
 }
