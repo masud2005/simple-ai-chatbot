@@ -1,10 +1,14 @@
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 import { MessageRole } from '@prisma';
+import { AiService } from '../ai/ai.service';
 
 @Injectable()
 export class ChatService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private ai: AiService,
+  ) {}
 
   async handleMessage(conversationId: string, content: string) {
     // 1. save user message
@@ -17,17 +21,19 @@ export class ChatService {
     });
 
     // 2. fake AI response (temporary)
-    const response = `AI: You said -> ${content}`;
+    // const response = `AI: You said -> ${content}`;
+    // Real Ai Response
+    const aiResponse = await this.ai.generateResponse(content);
 
     // 3. save assistant message
     await this.prisma.message.create({
       data: {
         conversationId,
-        content: response,
+        content: aiResponse,
         role: MessageRole.ASSISTANT,
       },
     });
 
-    return { response };
+    return { response: aiResponse };
   }
 }

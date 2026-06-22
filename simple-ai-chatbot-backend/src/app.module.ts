@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ChatModule } from './modules/chat/chat.module';
 import { ConversationsModule } from './modules/conversations/conversations.module';
 import { MessagesModule } from './modules/messages/messages.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { MessagesModule } from './modules/messages/messages.module';
     ChatModule,
     ConversationsModule,
     MessagesModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
