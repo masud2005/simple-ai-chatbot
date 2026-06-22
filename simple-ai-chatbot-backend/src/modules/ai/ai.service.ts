@@ -9,13 +9,13 @@ export class AiService {
     const model = this.genAI.getGenerativeModel({
       model: 'gemini-3.1-flash-lite',
     });
-    console.log('Model', model);
+    // console.log('Model', model);
 
     const result = await model.generateContent(message);
-    console.log('Result', result);
+    // console.log('Result', result);
 
     const response = result.response;
-    console.log('Response', response);
+    // console.log('Response', response);
 
     return response.text();
   }
