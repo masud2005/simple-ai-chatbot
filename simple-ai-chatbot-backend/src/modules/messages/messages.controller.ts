@@ -2,10 +2,13 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { MessageRole } from '@prisma';
+import { AiService } from '../ai/ai.service';
 
 @Controller('messages')
 export class MessagesController {
-  constructor(private service: MessagesService) {}
+  constructor(private service: MessagesService,
+    private aiService: AiService,
+  ) { }
 
   @Post()
   create(
@@ -23,4 +26,10 @@ export class MessagesController {
   find(@Param('conversationId') id: string) {
     return this.service.findByConversation(id);
   }
+
+  @Post("embedding-text")
+  embedding(@Body() body: { text: string }) {
+    return this.aiService.saveDocumentToDatabase(body.text)
+  }
+
 }
