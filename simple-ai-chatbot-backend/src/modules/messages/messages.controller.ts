@@ -1,35 +1,29 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { MessagesService } from './messages.service';
-import { MessageRole } from '@prisma';
-import { AiService } from '../ai/ai.service';
+import { Message, MessageRole } from '@prisma';
 
 @Controller('messages')
 export class MessagesController {
-  constructor(private service: MessagesService,
-    private aiService: AiService,
+  constructor(
+    private readonly service: MessagesService,
   ) { }
 
+  // Creates a new message.
   @Post()
-  create(
+  async create(
     @Body()
     body: {
       conversationId: string;
       content: string;
       role: MessageRole;
     },
-  ) {
+  ): Promise<Message> {
     return this.service.create(body.conversationId, body.content, body.role);
   }
 
+  // Retrieves all messages for a specific conversation.
   @Get(':conversationId')
-  find(@Param('conversationId') id: string) {
+  async find(@Param('conversationId') id: string): Promise<Message[]> {
     return this.service.findByConversation(id);
   }
-
-  @Post("embedding-text")
-  embedding(@Body() body: { text: string }) {
-    return this.aiService.saveDocumentToDatabase(body.text)
-  }
-
 }

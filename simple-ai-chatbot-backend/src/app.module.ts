@@ -7,6 +7,7 @@ import { ChatModule } from './modules/chat/chat.module';
 import { ConversationsModule } from './modules/conversations/conversations.module';
 import { MessagesModule } from './modules/messages/messages.module';
 import { AiModule } from './modules/ai/ai.module';
+import { KnowledgeModule } from './modules/knowledge/knowledge.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { AiModule } from './modules/ai/ai.module';
     ConversationsModule,
     MessagesModule,
     AiModule,
+    KnowledgeModule,
   ],
   controllers: [AppController],
   providers: [AppService],
