@@ -1,6 +1,7 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { AiService } from '../ai/ai.service';
 import { KnowledgeService } from './knowledge.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('knowledge')
 export class KnowledgeController {
@@ -9,10 +10,14 @@ export class KnowledgeController {
     private readonly knowledgeService: KnowledgeService,
   ) { }
 
-  // Generates embedding for text and saves it to the vector database.
-  @Post("embedding-text")
-  async embedding(@Body() body: { text: string }) {
-    const embedding = await this.aiService.createEmbedding(body.text);
-    return this.knowledgeService.saveDocumentToDatabase(body.text, embedding);
+  // POST /knowledge/upload
+  @Post('upload')
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+
+    return await this.knowledgeService.ingestFile(file);
   }
 }
