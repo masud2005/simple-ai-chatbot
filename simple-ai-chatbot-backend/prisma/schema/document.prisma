@@ -1,9 +1,5 @@
 model Document {
   id        String   @id @default(uuid())
-  content   String   // Coustom text
-  
-  // gemini-embedding-2 > size=3072, 
-  embedding Unsupported("vector(3072)")? 
-  
+  content   String // Coustom text
   createdAt DateTime @default(now())
 }

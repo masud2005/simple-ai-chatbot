@@ -8,6 +8,7 @@ import { ConversationsModule } from './modules/conversations/conversations.modul
 import { MessagesModule } from './modules/messages/messages.module';
 import { AiModule } from './modules/ai/ai.module';
 import { KnowledgeModule } from './modules/knowledge/knowledge.module';
+import { QdrantModule } from './qdrant/qdrant.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { KnowledgeModule } from './modules/knowledge/knowledge.module';
     MessagesModule,
     AiModule,
     KnowledgeModule,
+    QdrantModule,
   ],
   controllers: [AppController],
   providers: [AppService],
