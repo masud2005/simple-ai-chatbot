@@ -16,13 +16,11 @@ import type * as Prisma from "./prismaNamespace"
 
 
 const config: runtime.GetPrismaClientConfig = {
-  "previewFeatures": [
-    "postgresqlExtensions"
-  ],
+  "previewFeatures": [],
   "clientVersion": "7.8.0",
   "engineVersion": "3c6e192761c0362d496ed980de936e2f3cebcd3a",
   "activeProvider": "postgresql",
-  "inlineSchema": "model Conversation {\n  id       String    @id @default(uuid())\n  title    String\n  messages Message[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Document {\n  id      String @id @default(uuid())\n  content String // Coustom text\n\n  // gemini-embedding-2 > size=3072, \n  embedding Unsupported(\"vector(3072)\")?\n\n  createdAt DateTime @default(now())\n}\n\nenum MessageRole {\n  USER\n  ASSISTANT\n}\n\nmodel Message {\n  id String @id @default(uuid())\n\n  role    MessageRole\n  content String\n\n  conversationId String\n\n  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)\n\n  createdAt DateTime @default(now())\n}\n\n// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Get a free hosted Postgres database in seconds: `npx create-db`\n\ngenerator client {\n  provider        = \"prisma-client\"\n  output          = \"../generated/prisma\"\n  previewFeatures = [\"postgresqlExtensions\"]\n}\n\ndatasource db {\n  provider   = \"postgresql\"\n  extensions = [vector]\n}\n",
+  "inlineSchema": "model Conversation {\n  id       String    @id @default(uuid())\n  title    String\n  messages Message[]\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Document {\n  id        String   @id @default(uuid())\n  content   String // Coustom text\n  createdAt DateTime @default(now())\n}\n\nenum MessageRole {\n  USER\n  ASSISTANT\n}\n\nmodel Message {\n  id String @id @default(uuid())\n\n  role    MessageRole\n  content String\n\n  conversationId String\n\n  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)\n\n  createdAt DateTime @default(now())\n}\n\n// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Get a free hosted Postgres database in seconds: `npx create-db`\n\ngenerator client {\n  provider = \"prisma-client\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},

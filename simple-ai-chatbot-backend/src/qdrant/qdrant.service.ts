@@ -52,6 +52,7 @@ export class QdrantService implements VectorProvider, OnModuleInit {
             points: [{ id, vector, payload: { content: text } }]
         });
     }
+
     async searchSimilar(vector: number[], limit: number = 3): Promise<{ id: string; content: string; similarity: number }[]> {
         const results = await this.client.search(this.collectionName, {
             vector: vector,

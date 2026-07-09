@@ -1,14 +1,17 @@
+import { randomUUID } from 'crypto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { BadRequestException, Injectable, InternalServerErrorException, Logger } from '@nestjs/common';
 import { FileParserUtil } from './utils/file-parser.util';
 import { TextSplitterUtil } from './utils/text-splitter.util';
 import { AiService } from '../ai/ai.service';
+import { QdrantService } from '@/qdrant/qdrant.service';
 
 @Injectable()
 export class KnowledgeService {
     constructor(
         private prisma: PrismaService,
-        private ai: AiService
+        private ai: AiService,
+        private qdrantService: QdrantService
     ) { }
     private readonly logger = new Logger(KnowledgeService.name);
 
@@ -20,17 +23,8 @@ export class KnowledgeService {
         try {
             this.validateEmbedding(embeddingValues);
 
-            const vectorString = this.toVectorString(embeddingValues);
-
-            await this.prisma.$executeRaw`
-                INSERT INTO "Document" (id, content, embedding, "createdAt")
-                VALUES (
-                    gen_random_uuid(), 
-                    ${text}, 
-                    ${vectorString}::vector, 
-                    NOW()
-                )
-            `;
+            const id = randomUUID();
+            await this.qdrantService.saveVector(id, text, embeddingValues);
             return { success: true, message: "Document saved successfully!" };
         } catch (error) {
             this.logger.error("Failed to save document", error?.stack);
@@ -51,15 +45,7 @@ export class KnowledgeService {
         try {
             this.validateEmbedding(embeddingValues);
 
-            const vectorString = this.toVectorString(embeddingValues);
-
-            const documents = await this.prisma.$queryRaw`
-                SELECT id, content, 1 - (embedding <=> ${vectorString}::vector) as similarity
-                FROM "Document"
-                ORDER BY embedding <=> ${vectorString}::vector
-                LIMIT 3; 
-            `;
-            return documents as { id: string; content: string; similarity: number }[];
+            return await this.qdrantService.searchSimilar(embeddingValues);
         } catch (error) {
             this.logger.error("Failed to find similar documents", error?.stack);
             throw new InternalServerErrorException({
